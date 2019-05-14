@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 
 import br.com.uol.projetoclima.entity.Cliente;
 
@@ -41,8 +42,6 @@ public class ProjetoClimaApplicationTests {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webAppContext).build();
 	}
 
-	
-	
 	@Test
 	public void testePostCadastraClienteBadRequest() throws Exception {
 		this.mockMvc.perform(post("/cliente"))
@@ -53,37 +52,48 @@ public class ProjetoClimaApplicationTests {
 	@Test
 	public void testePostCadastraClienteOk() throws Exception {
 		this.mockMvc.perform(post("/cliente")
-				.content(mapper.writeValueAsString(new Cliente("Teste", 20)))
+				.content(mapper.writeValueAsString(new Cliente("Teste", 25)))
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.status").value("OK"))
-				.andExpect(jsonPath("$.mensagem").isString());
+				.andExpect(jsonPath("$.mensagem").isString())
+				.andExpect(jsonPath("$.id").isNumber());
 	}
 	
 	@Test
 	public void testePutAlteraClienteNotFound() throws Exception {
-		MvcResult mvcResult = this.mockMvc.perform(put("/cliente/2"))
+		this.mockMvc.perform(put("/cliente/98")
+				.content(mapper.writeValueAsString(new Cliente("Teste Put", 22)))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
-				.andExpect(status().isNotFound())
-				.andReturn();
-
-		Assert.assertEquals("application/json;charset=UTF-8",
-				mvcResult.getResponse().getContentType());
+				.andExpect(status().isNotFound());
 	}
 
 	
 	@Test
 	public void testePutAlteraClienteOk() throws Exception {
-		this.mockMvc.perform(put("/cliente/1")
+		
+		MvcResult mvcResult = this.mockMvc.perform(post("/cliente")
+				.content(mapper.writeValueAsString(new Cliente("Teste", 25)))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+				.andReturn();
+		
+		String response = mvcResult.getResponse().getContentAsString();
+		Integer idCriado = JsonPath.parse(response).read("$.id");
+		
+		this.mockMvc.perform(put("/cliente/"+idCriado)
 				.content(mapper.writeValueAsString(new Cliente("Teste Put", 22)))
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.status").value("OK"))
-				.andExpect(jsonPath("$.mensagem").isString());
+				.andExpect(jsonPath("$.mensagem").isString())
+				.andExpect(jsonPath("$.id").value(idCriado));
 	}
 	
 	@Test
@@ -99,43 +109,59 @@ public class ProjetoClimaApplicationTests {
 
 	@Test
 	public void testeGetBuscaClientePorIdNotFound() throws Exception {
-		this.mockMvc.perform(get("/cliente/2"))
+		this.mockMvc.perform(get("/cliente/99"))
 				.andDo(print())
-				.andExpect(status().isNotFound())
-				.andReturn();
+				.andExpect(status().isNotFound());
 
 	}
 
 	
 	@Test
 	public void testeGetBuscaClientePorIdOK() throws Exception {
-		MvcResult mvcResult = this.mockMvc.perform(get("/cliente/1"))
+		
+		MvcResult mvcResult = this.mockMvc.perform(post("/cliente")
+				.content(mapper.writeValueAsString(new Cliente("Teste Get", 25)))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+				.andReturn();
+		
+		String response = mvcResult.getResponse().getContentAsString();
+		Integer idCriado = JsonPath.parse(response).read("$.id");
+		
+		this.mockMvc.perform(get("/cliente/"+idCriado))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andReturn();
-
-		Assert.assertEquals("application/json;charset=UTF-8",
-				mvcResult.getResponse().getContentType());
+				.andExpect(jsonPath("$.id").value(idCriado))
+				.andExpect(jsonPath("$.nome").value("Teste Get"))
+				.andExpect(jsonPath("$.idade").value(25));
 	}
-	
 	
 	@Test
 	public void testeDeleteApagaClienteNotFound() throws Exception {
-		this.mockMvc.perform(delete("/cliente/2"))
+		this.mockMvc.perform(delete("/cliente/99"))
 				.andDo(print())
 				.andExpect(status().isNotFound());
 	}
-	
-
 
 
 	@Test
 	public void testeDeleteApagaClienteOK() throws Exception {
-		this.mockMvc.perform(delete("/cliente/1"))
+		
+		MvcResult mvcResult = this.mockMvc.perform(post("/cliente")
+				.content(mapper.writeValueAsString(new Cliente("Teste Delete", 15)))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+				.andReturn();
+		
+		String response = mvcResult.getResponse().getContentAsString();
+		Integer idCriado = JsonPath.parse(response).read("$.id");
+		
+		this.mockMvc.perform(delete("/cliente/"+idCriado))
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.status").value("OK"))
-				.andExpect(jsonPath("$.mensagem").isString());
+				.andExpect(jsonPath("$.mensagem").isString())
+				.andExpect(jsonPath("$.id").value(idCriado));
 	}
-
+	
 }

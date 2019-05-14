@@ -81,15 +81,16 @@ public class ClienteController {
 			if(ObjectUtils.isEmpty(ipVigilante)) {
 				
 				resposta.setStatus("OK");
-				resposta.setMensagem("Cliente criado com id: "+ clienteSalvo.getId() + ", sem Clima devido ao IP inválido" );
-
+				resposta.setMensagem("Cliente criado, sem Clima devido ao IP inválido!" );
+				resposta.setId(clienteSalvo.getId());
 				return ResponseEntity.ok(resposta);
 			}
 			
 			apiMetaWeather.cadastraClima(ipVigilante, clienteSalvo, serviceClima);
 			
 			resposta.setStatus("OK");
-			resposta.setMensagem("Cliente criado com id: "+ clienteSalvo.getId());
+			resposta.setMensagem("Cliente criado com sucesso!");
+			resposta.setId(clienteSalvo.getId());
 			logger.info("Cliente criado com id: {}", clienteSalvo.getId());
 			
 		} catch (Exception e) {
@@ -121,12 +122,15 @@ public class ClienteController {
 			
 			resposta.setStatus("OK");
 			resposta.setMensagem("Cliente alterado com sucesso!");
+			resposta.setId(id);
 			logger.info("Cliente com id: {} alterado com sucesso",id);
 			
 		} catch (Exception e) {
 			resposta.setStatus("Falha");
 			resposta.setMensagem("Falha ao alterar o cliente! \n Erro:" + e.getMessage());
+			resposta.setId(id);
 			logger.error("[Falha ao alterar cliente com id: {}] Erro: {}",id, e.getMessage());
+			
 			
 			return ResponseEntity.badRequest().body(resposta);
 		}
@@ -152,11 +156,13 @@ public class ClienteController {
 			
 			resposta.setStatus("OK");
 			resposta.setMensagem("Cliente deletado com sucesso!");
+			resposta.setId(id);
 			logger.info("Cliente com id: {} deletado com sucesso",id);
 			
 		} catch (Exception e) {
 			resposta.setStatus("Falha");
 			resposta.setMensagem("Falha ao deletar o cliente! \n Erro: " + e.getMessage());
+			resposta.setId(id);
 			logger.error("[Falha ao deletar cliente com id: {}] Erro: {}",id, e.getMessage());
 			
 			return ResponseEntity.badRequest().body(resposta);
