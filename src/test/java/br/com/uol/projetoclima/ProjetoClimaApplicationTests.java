@@ -57,7 +57,6 @@ public class ProjetoClimaApplicationTests {
 				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.status").value("OK"))
 				.andExpect(jsonPath("$.mensagem").isString())
 				.andExpect(jsonPath("$.id").isNumber());
 	}
@@ -91,7 +90,6 @@ public class ProjetoClimaApplicationTests {
 				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.status").value("OK"))
 				.andExpect(jsonPath("$.mensagem").isString())
 				.andExpect(jsonPath("$.id").value(idCriado));
 	}
@@ -159,9 +157,19 @@ public class ProjetoClimaApplicationTests {
 		this.mockMvc.perform(delete("/cliente/"+idCriado))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.status").value("OK"))
 				.andExpect(jsonPath("$.mensagem").isString())
 				.andExpect(jsonPath("$.id").value(idCriado));
+	}
+	
+	@Test
+	public void testeGetBuscaClimasOK() throws Exception {
+		MvcResult mvcResult = this.mockMvc.perform(get("/clima"))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andReturn();
+
+		Assert.assertEquals("application/json;charset=UTF-8",
+				mvcResult.getResponse().getContentType());
 	}
 	
 }

@@ -12,9 +12,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.uol.projetoclima.entity.Clima;
 import br.com.uol.projetoclima.service.ClimaService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.SwaggerDefinition;
+import io.swagger.annotations.Tag;
 
 @RestController
 @RequestMapping("/clima")
+@Api(tags = {"REST Clima"})
+@SwaggerDefinition(tags = {
+    @Tag(name = "REST Clima", description = "REST Clima")
+})
 public class ClimaController {
 	
 	@Autowired
@@ -23,8 +31,9 @@ public class ClimaController {
 	private static final Logger logger = LoggerFactory.getLogger(ClimaController.class);
 	
 	@GetMapping
+	@ApiOperation(value = "Busca todos os Climas cadastrados")
 	public ResponseEntity<List<Clima>> buscaTodos(){
-		logger.info("[GET] Listando todos os Climas dos Clientes");
+		logger.info("metodo:GET Listando todos os Climas dos Clientes");
 		return ResponseEntity.ok(service.buscaTodos());
 		
 	}

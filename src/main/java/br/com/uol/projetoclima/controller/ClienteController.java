@@ -26,10 +26,22 @@ import br.com.uol.projetoclima.entity.Cliente;
 import br.com.uol.projetoclima.json.RespostaAPI;
 import br.com.uol.projetoclima.service.ClienteService;
 import br.com.uol.projetoclima.service.ClimaService;
+import br.com.uol.projetoclima.util.ValidaCliente;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.SwaggerDefinition;
+import io.swagger.annotations.Tag;
 
 @RestController
 @RequestMapping("/cliente")
+@Api(tags = {"REST Cliente"})
+@SwaggerDefinition(tags = {
+    @Tag(name = "REST Cliente", description = "REST Cliente")
+})
 public class ClienteController {
+	
+	@Autowired
+	private ValidaCliente validaCliente;
 
 	@Autowired
 	private ClienteService serviceCliente;
@@ -46,15 +58,17 @@ public class ClienteController {
 	private static final Logger logger = LoggerFactory.getLogger(ClienteController.class);
 
 	@GetMapping
+	@ApiOperation(value = "Busca todos os Clientes cadastrados")
 	public ResponseEntity<List<Cliente>> listaTodos() {
-		logger.info("[GET] Listando todos os Clientes");
+		logger.info("metodo:GET Listando todos os Clientes");
 		return ResponseEntity.ok(serviceCliente.listaTodos());
 	}
 
 	@GetMapping("/{id}")
+	@ApiOperation(value = "Busca Cliente por id")
 	public ResponseEntity<Optional<Cliente>> buscaCliente(@PathVariable long id) {
 		
-		logger.info("[GET] Buscando cliente por id");
+		logger.info("metodo:GET Buscando cliente por id");
 		Optional<Cliente> clienteBuscado = serviceCliente.buscaPorId(id);
 
 		if (!clienteBuscado.isPresent()) {
@@ -67,11 +81,12 @@ public class ClienteController {
 	}
 
 	@PostMapping
+	@ApiOperation(value = "Cadastra um novo Cliente")
 	public ResponseEntity<RespostaAPI> criaCliente(@RequestBody Cliente cliente, HttpServletRequest request) {
 		
 		RespostaAPI resposta = new RespostaAPI();
 		
-		logger.info("[POST] Criando novo cliente");
+		logger.info("metodo:POST Criando novo cliente");
 		try {
 		
 			Cliente clienteSalvo = serviceCliente.salvar(cliente);
@@ -80,7 +95,6 @@ public class ClienteController {
 			
 			if(ObjectUtils.isEmpty(ipVigilante)) {
 				
-				resposta.setStatus("OK");
 				resposta.setMensagem("Cliente criado, sem Clima devido ao IP inválido!" );
 				resposta.setId(clienteSalvo.getId());
 				return ResponseEntity.ok(resposta);
@@ -88,13 +102,11 @@ public class ClienteController {
 			
 			apiMetaWeather.cadastraClima(ipVigilante, clienteSalvo, serviceClima);
 			
-			resposta.setStatus("OK");
 			resposta.setMensagem("Cliente criado com sucesso!");
 			resposta.setId(clienteSalvo.getId());
 			logger.info("Cliente criado com id: {}", clienteSalvo.getId());
 			
 		} catch (Exception e) {
-			resposta.setStatus("Falha");
 			resposta.setMensagem("Falha ao criar Cliente! \n Erro: " + e.getMessage());
 			logger.error("[Falha ao criar Cliente!] Erro: {}", e.getMessage());
 			
@@ -105,10 +117,11 @@ public class ClienteController {
 	}
 
 	@PutMapping("/{id}")
+	@ApiOperation(value = "Atualiza os dados de um Cliente")
 	public ResponseEntity<RespostaAPI> atualizaCliente(@PathVariable long id, @RequestBody Cliente cliente) {
 
 		RespostaAPI resposta = new RespostaAPI();
-		logger.info("[PUT] Alterando cliente");
+		logger.info("metodo:PUT Alterando cliente");
 		
 		try {
 			Optional<Cliente> clienteBuscado = serviceCliente.buscaPorId(id);
@@ -117,16 +130,18 @@ public class ClienteController {
 				return ResponseEntity.notFound().build();
 			}
 			
+			String nomeCliente = validaCliente.validaNomeCliente(clienteBuscado, cliente);
+
 			cliente.setId(id);
+			cliente.setNome(nomeCliente);
+
 			serviceCliente.salvar(cliente);
 			
-			resposta.setStatus("OK");
 			resposta.setMensagem("Cliente alterado com sucesso!");
 			resposta.setId(id);
 			logger.info("Cliente com id: {} alterado com sucesso",id);
 			
 		} catch (Exception e) {
-			resposta.setStatus("Falha");
 			resposta.setMensagem("Falha ao alterar o cliente! \n Erro:" + e.getMessage());
 			resposta.setId(id);
 			logger.error("[Falha ao alterar cliente com id: {}] Erro: {}",id, e.getMessage());
@@ -139,10 +154,11 @@ public class ClienteController {
 	}
 
 	@DeleteMapping("/{id}")
+	@ApiOperation(value = "Deleta os dados de um Cliente")
 	public ResponseEntity<RespostaAPI> deletarCliente(@PathVariable long id){
 		
 		RespostaAPI resposta = new RespostaAPI();
-		logger.info("[DELETE] Deletando cliente");
+		logger.info("metodo:DELETE Deletando cliente");
 		try {
 			
 			Optional<Cliente> clienteBuscado = serviceCliente.buscaPorId(id);
@@ -154,13 +170,11 @@ public class ClienteController {
 			
 			serviceCliente.deletar(id);
 			
-			resposta.setStatus("OK");
 			resposta.setMensagem("Cliente deletado com sucesso!");
 			resposta.setId(id);
 			logger.info("Cliente com id: {} deletado com sucesso",id);
 			
 		} catch (Exception e) {
-			resposta.setStatus("Falha");
 			resposta.setMensagem("Falha ao deletar o cliente! \n Erro: " + e.getMessage());
 			resposta.setId(id);
 			logger.error("[Falha ao deletar cliente com id: {}] Erro: {}",id, e.getMessage());
