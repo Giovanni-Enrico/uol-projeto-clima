@@ -15,21 +15,15 @@ public class ClienteService {
 	@Autowired
 	private ClienteRepository repository;
 	
-//	@Cacheable(value = "deliveries")
 	public List<Cliente> listaTodos(){
 		return repository.findAll();
 	}
 	
-//	@Cacheable(value = "delivery")
 	public Optional<Cliente> buscaPorId(Long id) {
 		return repository.findById(id);
 	}
 	
     
-//@Caching    
-//(evict = {
-//        @CacheEvict(value="delivery", allEntries=true),
-//        @CacheEvict(value="deliveries", allEntries=true) })
 	public Cliente salvar(Cliente cliente) {
 		return repository.save(cliente);
 	}

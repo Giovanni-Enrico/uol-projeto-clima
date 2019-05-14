@@ -6,7 +6,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "t_cliente")
@@ -19,9 +18,16 @@ public class Cliente {
 	@NotEmpty(message = "Campo nome não pode ser vazio!")
 	private String nome;
 	
-	@NotNull(message = "Campo idade não pode ser vazio!")
-	private int idade;	
-    
+	private int idade;
+
+	public Cliente() {
+	}
+	
+	public Cliente(String nome, int idade) {
+		this.idade = idade;
+		this.nome = nome;
+	}
+
 	public Long getId() {
 		return id;
 	}

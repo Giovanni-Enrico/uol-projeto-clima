@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -72,10 +73,18 @@ public class ClienteController {
 		
 		logger.info("[POST] Criando novo cliente");
 		try {
+		
+			Cliente clienteSalvo = serviceCliente.salvar(cliente);
 			
 			IPVigilante ipVigilante = apiIpVigilante.buscaLocalizacao(request);
 			
-			Cliente clienteSalvo = serviceCliente.salvar(cliente);
+			if(ObjectUtils.isEmpty(ipVigilante)) {
+				
+				resposta.setStatus("OK");
+				resposta.setMensagem("Cliente criado com id: "+ clienteSalvo.getId() + ", sem Clima devido ao IP inválido" );
+
+				return ResponseEntity.ok(resposta);
+			}
 			
 			apiMetaWeather.cadastraClima(ipVigilante, clienteSalvo, serviceClima);
 			
@@ -90,7 +99,6 @@ public class ClienteController {
 			
 			return ResponseEntity.badRequest().body(resposta);
 		}
-		
 		
 		return ResponseEntity.ok(resposta);
 	}

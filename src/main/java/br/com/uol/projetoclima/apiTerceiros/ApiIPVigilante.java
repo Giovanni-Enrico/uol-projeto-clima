@@ -26,9 +26,9 @@ public class ApiIPVigilante {
 			IPVigilante ipVigilante = restTemplate.getForObject(IPVIGILANTE_URL.concat(ip), IPVigilante.class);
 			return ipVigilante;
 		} catch (Exception e) {
-			throw new java.lang.RuntimeException("O IP utilizado é invalido!");
+//			throw new java.lang.RuntimeException("O IP utilizado é invalido!");
+			logger.info("[IPVigilante] IP:{} invalido, cadastro salvo sem clima.",ip);
+			return null;
 		}
-
 	}
-
 }
