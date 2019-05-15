@@ -1,6 +1,10 @@
 # Projeto Clima - UOL
 
-Projeto Clima UOL escrito em Spring Boot
+Projeto Clima UOL escrito em Java utilizando o framework Spring Boot
+
+## Pré-Requisitos
+
+Possuir Java 8 e Maven instalados na sua máquina
 
 ## Execução do Projeto via IDE
 
@@ -12,7 +16,7 @@ Após realizar o download do código, iremos importar o projeto para nossa IDE, 
 4. Clicar com o botão direito na classe "ProjetoClimaApplication.java"
 5. Run As -> Java Application
 
-Isso fará com que a classe responsável por subir nosso servidor e iniciar nossa aplicação seja executada
+Isso fará com que a classe responsável por subir nosso servidor e iniciar nossa aplicação seja executada.
 
 Podemos verificar se a aplicação está no ar através do link gerado pelo Swagger, onde mostra uma documentação de nossa API:
 
@@ -44,17 +48,17 @@ Para empacotarmos nosso projeto, devemos:
 mvn clean install
 ```
 
-Neste comando as dependências do projeto serão baixadas, os testes serão executados novamente para garantir um novo build sem erros e nosso projeto será empacotado
+Neste comando as dependências do projeto serão baixadas, os testes serão executados novamente para garantir um novo build sem erros e nosso projeto será empacotado.
 
-Após o final do comando, teremos um arquivo chamado "**projeto-clima-0.0.1-SNAPSHOT.jar**" dentro da nossa pasta "**target**"
+Após o final do comando, teremos um arquivo chamado "**projeto-clima-0.0.1-SNAPSHOT.jar**" dentro da nossa pasta "**target**".
 
-Para rodarmos este novo .jar, executamos ainda dentro da raiz do projeto o comando 
+Para rodarmos este novo .jar, executamos ainda dentro da raiz do projeto o comando:
 
 ```bash
 java -jar target/projeto-clima-0.0.1-SNAPSHOT.jar
 ```
 
-**Com isso teremos nosso projeto sendo executado**
+**Com isso teremos nosso projeto sendo executado!**
 
 
 ## Ferramentas Utilizadas
